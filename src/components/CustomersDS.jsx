@@ -78,7 +78,7 @@ function CustomersDS() {
             {/* Header */}
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="font-bold text-lg text-purple-400">User Details</h2>
+                <h2 className="font-black text-lg text-(--primary-color)">User Details</h2>
                 <h2 className="font-bold text-md mt-1">Name: {customer.userName}</h2>
                 <p className="text-sm opacity-70">Email: {customer.email}</p>
               </div>

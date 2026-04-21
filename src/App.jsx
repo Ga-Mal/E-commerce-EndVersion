@@ -16,18 +16,25 @@ import ProductsPage from "./pages/ProductsPage";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import ContactPage from "./pages/ContactPage";
+import NotFound from "./pages/NotFound";
+import ErrorPage from "./pages/ErrorPage";
 
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
 import BackToTop from "./components/BackToTop";
 
+// Main Layout component that wraps the entire application
+// Includes global UI elements like Navbar, Footer, and Notification Toaster
 function MainLayout() {
   return (
     <>
+      {/* Ensures the page scrolls to the top on every route change */}
       <ScrollToTop />
+      {/* Global notification container for react-hot-toast */}
       <Toaster position="top-left" reverseOrder={false} />
       <Navbar />
+      {/* Dynamic content placeholder for child routes */}
       <Outlet />
       <BackToTop />
       <Footer />
@@ -35,10 +42,14 @@ function MainLayout() {
   );
 }
 
+// Router configuration using React Router 7 (createBrowserRouter)
+// Defines public and protected routes, including nested dashboard routes
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
+    // Custom Error Boundary for catching runtime exceptions
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
@@ -48,7 +59,7 @@ const router = createBrowserRouter([
       { path: "products/:id", element: <ProductDetails /> },
       { path: "cart", element: <Cart /> },
       
-      // Protected Dashboard Routes
+      // Protected Dashboard Routes: Only accessible by users with "Admin" role
       { 
         path: "dashboard", 
         element: <ProtectedRoute requiredRole="Admin" />, 
@@ -67,12 +78,16 @@ const router = createBrowserRouter([
           }
         ]
       },
+      // Catch-all route for non-existent URLs (404 Page)
+      { path: "*", element: <NotFound /> },
     ],
   },
 ]);
 
+// Root Application Component
 export default function App(){
   return (
+    // Provides Authentication State globally to the entire app
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>

@@ -35,6 +35,7 @@ export default function Reviews() {
   if (feedbacks.length === 0) return null;
 
   const displayFeedbacks = feedbacks.slice(0, 3);
+  // console.log(displayFeedbacks);
 
   return (
     <section className="py-7 w-[95%] md:py-10 px-6 max-w-7xl mx-auto">

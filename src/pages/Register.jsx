@@ -4,8 +4,10 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { FaFacebookF, FaGoogle } from "react-icons/fa";
 import { inputsStyle } from "./Login";
 import toast from "react-hot-toast";
+import ErrorMessage from "../components/ErrorMessage";
 import API_ENDPOINTS from "../config/apiConfig";
 
+// Register Page: Allows new users to create accounts
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -15,32 +17,38 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+  const [error, setError] = useState(""); // Local UI error state
 
   const [loading, setLoading] = useState(false);
 
+  // Handles the account creation logic
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError(""); // Reset previous error state
 
-    // 1️⃣ Validation
+    // 1️ Client-side Validation: Ensure all fields are filled
     if (!name || !email || !phone || !password || !confirmPassword) {
-      toast.error("Please fill in all fields.");
+      setError("Please fill in all fields.");
       return;
     }
 
+    // 2️ Username Validation: Alphanumeric only (no spaces)
     const usernameRegex = /^[a-zA-Z0-9]+$/;
     if (!usernameRegex.test(name)) {
-      toast.error("Username can only contain letters and numbers (no spaces).");
+      setError("Username can only contain letters and numbers (no spaces).");
       return;
     }
 
+    // 3️ Password Match Validation
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
+    // 4️ Strict Password Policy: Upper case, Number, Special Char, Min 8 chars
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?\/\\|`~]).{8,}$/;
     if (!passwordRegex.test(password)) {
-      toast.error("Weak password! Must include an uppercase letter, a number, and a special character.");
+      setError("Weak password! Must include an uppercase letter, a number, and a special character.");
       return;
     }
 
@@ -48,6 +56,7 @@ export default function Register() {
     const toastId = toast.loading("Creating account...");
 
     try {
+      // Step 5: Send registration data to the API
       const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -60,20 +69,26 @@ export default function Register() {
         })
       });
 
+      // Step 6: Handle Success
       if (response.ok) {
         toast.success("Account created successfully!", { id: toastId });
+        // Reset form fields
         setName("");
         setEmail("");
         setPhone("");
         setPassword("");
         setConfirmPassword("");
+        // Redirect user to login page
         navigate("/login");
       } else {
+        // Step 7: Handle API Errors (e.g., Email already exists)
         const errText = await response.text();
         throw new Error(errText || "Registration failed");
       }
     } catch (err) {
-      toast.error(err.message, { id: toastId });
+      console.error("Registration Error:", err);
+      setError(err.message || "Registration failed");
+      toast.dismiss(toastId);
     } finally {
       setLoading(false);
     }
@@ -92,7 +107,10 @@ export default function Register() {
           </p>
         </div>
 
-        {/* Form */}
+        {/* Displays error messages inline if validation or API fails */}
+        <ErrorMessage message={error} onClose={() => setError("")} />
+
+        {/* Registration Form */}
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
             <label
@@ -158,6 +176,7 @@ export default function Register() {
               className={inputsStyle}
             />
 
+            {/* Toggle password visibility */}
             <span
               title={showConfirmPassword ? "Hide password" : "Show password"}
               onClick={() => setShowPassword((prev) => !prev)}
@@ -182,6 +201,7 @@ export default function Register() {
               className={inputsStyle}
             />
 
+            {/* Toggle confirmation password visibility */}
             <span
               title={showConfirmPassword ? "Hide password" : "Show password"}
               onClick={() => setShowConfirmPassword((prev) => !prev)}
@@ -202,14 +222,13 @@ export default function Register() {
           </button>
         </form>
 
-        {/* Divider */}
+        {/* Social Login Options (UI Only) */}
         <div className="my-6 flex items-center gap-3">
           <div className="flex-1 h-px bg-(--text-color)" />
           <span className="text-sm ">OR</span>
           <div className="flex-1 h-px bg-(--text-color)" />
         </div>
 
-        {/* Social */}
         <button className="w-full flex items-center justify-center gap-7 mb-2 bg-(--primary-color) cursor-pointer text-white py-2 rounded-lg font-bold hover:scale-105 transition-all disabled:opacity-50">
           Continue With Google
           <FaGoogle />
@@ -220,7 +239,6 @@ export default function Register() {
           <FaFacebookF />
         </button>
 
-        {/* Login */}
         <p className="text-center text-sm mt-6">
           Already have an account?{" "}
           <Link

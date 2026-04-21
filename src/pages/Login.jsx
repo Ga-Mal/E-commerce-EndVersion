@@ -1,70 +1,93 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import axios from "axios";
+import ErrorMessage from "../components/ErrorMessage";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import API_ENDPOINTS from "../config/apiConfig";
 
+// Login Page: Handles user authentication and session creation
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // UI-level error state
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login } = useAuth(); // Access login function from AuthContext
 
+  // Validates user input before sending data to the server
   const validateInputs = () => {
-    // Check for valid email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // Check for at least 8 characters, one uppercase letter, one number, and one special character
-    // The previous regex might be too strict for existing accounts. 
-    // We'll keep it as the user had it.
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?\/\\|`~]).{8,}$/;
-
+    
     if (!emailRegex.test(email)) {
-      toast.error("Invalid email format!");
+      setError("Invalid email format!");
       return false;
     }
-    // Commented out the strict password check for login because it prevents logging into older accounts that don't match the regex. Registration should enforce it.
-    // if (!passwordRegex.test(password)) {
-    //   toast.error("Weak password! Must include an uppercase letter, a number, and a special character.");
-    //   return false;
-    // }
     return true;
   };
 
+  // Main login handler
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError(""); // Reset previous errors
 
     if (!validateInputs()) return;
 
     setLoading(true);
     
+    // Show a temporary loading toast to give immediate feedback
     const loadingToast = toast.loading("Signing in...");
 
     try {
-      const response = await axios.post(API_ENDPOINTS.LOGIN, {
-        email: email,
-        password: password,
+      // Step 1: Send credentials to the backend
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
       });
 
-      const token = response.data.token || response.data; // Handle string or object return
+      // Step 2: Handle failed authentication (Invalid password/email)
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = "Invalid credentials or network error.";
+        try {
+          // Attempt to parse JSON error message if provided by server
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || errorData || errorMessage;
+        } catch (e) {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Step 3: Extract the Authentication Token (JWT)
+      const text = await response.text();
+      let token;
+      
+      try {
+        const data = JSON.parse(text);
+        token = data.token || data;
+      } catch (e) {
+        token = text; // Server returned raw JWT string
+      }
 
       if (token) {
-        login(token); // Update AuthContext
-        
-        // Update the toast to success
+        // Step 4: Save token and redirect
+        login(token); // Triggers AuthContext update
         toast.success("Welcome back!", { id: loadingToast });
-        
         navigate("/"); 
       } else {
         throw new Error("No token received from server");
       }
     } catch (err) {
-      // Update the toast to failure
-      const errorMsg = err.response?.data?.message || err.response?.data || "Invalid credentials or network error.";
-      toast.error(typeof errorMsg === 'string' ? errorMsg : "Login failed", { id: loadingToast });
+      // Step 5: Handle errors gracefully in the UI
+      console.error("Login Error:", err);
+      setError(err.message || "Login failed");
+      toast.dismiss(loadingToast); // Remove the loading toast on failure
     } finally {
       setLoading(false);
     }
@@ -81,6 +104,9 @@ export default function Login() {
             Please sign in to your account
           </p>
         </div>
+
+        {/* Displays form-level errors if they exist */}
+        <ErrorMessage message={error} onClose={() => setError("")} />
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -111,6 +137,7 @@ export default function Login() {
               placeholder="••••••••"
             />
 
+            {/* Toggle password visibility */}
             <span
               onClick={() => setShowPassword((prev) => !prev)}
               className="absolute right-3 top-6.5 text-(--primary-color) cursor-pointer transition-colors">
@@ -137,4 +164,5 @@ export default function Login() {
   );
 }
 
+// Global reusable style for form inputs
 export const inputsStyle = "w-full px-3 py-1.5 text-(--text-color) border rounded-lg focus:ring-(--primary-color) focus:ring-2 focus:border-transparent outline-none transition-colors text-sm";

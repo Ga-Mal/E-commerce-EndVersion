@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import API_ENDPOINTS from "../config/apiConfig";
 
+// ProductsDS: Dashboard Section for Inventory Management
+// Handles full CRUD for products including image uploads via FormData
 function ProductsDS() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editingProduct, setEditingProduct] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null); // Track which product is being updated
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null); // Local file state for image uploads
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -21,16 +23,15 @@ function ProductsDS() {
 
   const token = localStorage.getItem("token");
 
+  // Fetch all necessary data on load
   useEffect(() => {
     loadData();
   }, []);
 
+  // Fetches both products and categories in parallel for efficiency
   const loadData = async () => {
     try {
-      const [prodRes, catRes] = await Promise.all([
-        fetch(API_ENDPOINTS.PRODUCTS),
-        fetch(API_ENDPOINTS.CATEGORIES)
-      ]);
+      const [prodRes, catRes] = await Promise.all([fetch(API_ENDPOINTS.PRODUCTS),fetch(API_ENDPOINTS.CATEGORIES)]);
       if (!prodRes.ok || !catRes.ok) throw new Error("Fetch failed");
       setProducts(await prodRes.json());
       setCategories(await catRes.json());
@@ -50,6 +51,7 @@ function ProductsDS() {
     setSelectedFile(e.target.files[0]);
   };
 
+  // Opens the Add/Edit modal and populates it with product data if editing
   const openModal = (product = null) => {
     if (product) {
       setEditingProduct(product);
@@ -73,6 +75,7 @@ function ProductsDS() {
     setEditingProduct(null);
   };
 
+  // Handles both Create (POST) and Update (PUT) logic using FormData (required for image files)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -86,39 +89,37 @@ function ProductsDS() {
       data.append("stock", parseInt(formData.stock)); 
       data.append("categoryId", formData.categoryId);
 
-      // Only append the image if a new file is selected (for both add and edit)
+      // Only append the image if a new file is selected
       if (selectedFile) {
         data.append("image", selectedFile); 
       }
+      
       const url = editingProduct ? API_ENDPOINTS.PRODUCT_BY_ID(editingProduct.id) : API_ENDPOINTS.ADD_PRODUCT;
-        
       const method = editingProduct ? "PUT" : "POST"; 
 
       const res = await fetch(url, {
         method: method,
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Admin token required
         },
         body: data,
       });
 
       if (!res.ok) {
         const errorResponse = await res.json();
-        // Read error response and extract message
+        // Friendly alert for validation errors
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Invalid data. Please check your inputs, The Image Path Must Be jpg Or png ",
+          text: "Invalid data. Please check your inputs.",
           confirmButtonText: "OK",
         })
         console.error("Validation Errors:", errorResponse);
-        
-        const errorMessage = errorResponse.errors ? Object.values(errorResponse.errors).flat()[0] : (errorResponse.message || "حدث خطأ أثناء حفظ البيانات");
-        
+        const errorMessage = errorResponse.errors ? Object.values(errorResponse.errors).flat()[0] : (errorResponse.message || "Error saving product");
         throw new Error(errorMessage);
       }
 
-      await loadData(); // ‘Update the product list after add/edit
+      await loadData(); // Refresh list after changes
       Swal.fire({
         icon: "success",
         title: editingProduct ? "Updated" : "Added",
@@ -134,8 +135,8 @@ function ProductsDS() {
     }
   };
 
+  // Handles product deletion with a confirmation prompt
   const handleDeleteProduct = async (id) => {
-    // 1. Show confirmation dialog
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -144,28 +145,20 @@ function ProductsDS() {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel"
     });
 
-    // 2. If user confirmed, proceed with deletion
     if (result.isConfirmed) {
       try {
         const res = await fetch(API_ENDPOINTS.PRODUCT_BY_ID(id), {
           method: "DELETE",
-          headers: { 
-            Authorization: `Bearer ${token}` 
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || "Failed to delete the product");
-        }
+        if (!res.ok) throw new Error("Failed to delete the product");
 
-        // 3. Update the UI state immediately
+        // Optimistically update the UI by removing the product from local state
         setProducts((prev) => prev.filter((product) => product.id !== id));
 
-        // 4. Show success message
         Swal.fire({
           title: "Deleted!",
           text: "The product has been removed.",
@@ -173,9 +166,7 @@ function ProductsDS() {
           timer: 1500,
           showConfirmButton: false
         });
-
       } catch (err) {
-        // 5. Show error message if API fails
         Swal.fire("Error!", err.message, "error");
       }
     }
@@ -187,7 +178,7 @@ function ProductsDS() {
     <div className="p-2 min-h-screen font-sans">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-bold text-[15px] md:text-2xl">Inventory Management</h2>
-        <button onClick={() => openModal()} className="bg-(--primary-color) text-[15px] md:text-[20px] md:px-6 md:py-2 rounded-lg hover:bg-purple-700 cursor-pointer font-bold transition">
+        <button onClick={() => openModal()} className="bg-(--primary-color) text-gray-100 text-[15px] md:text-[20px] md:px-6 md:py-2 rounded-lg hover:bg-purple-700 cursor-pointer font-bold transition">
           + New Product
         </button>
       </div>

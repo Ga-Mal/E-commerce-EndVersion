@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast/headless";
+import Swal from "sweetalert2";
 import API_ENDPOINTS from "../config/apiConfig";
 
 function CategoriesDS() {
@@ -67,7 +67,7 @@ function CategoriesDS() {
     } catch (err) {
       console.error(err);
       setError(err.message);
-      toast.error("Failed to create category");
+      Swal.fire("Error!", "Failed to create category", "error");
     } finally {
       setLoading(false);
     }
@@ -88,9 +88,9 @@ function CategoriesDS() {
 
     // Update UI
     setCategories((prev) => prev.filter((cat) => cat.id !== id));
-    toast.success("Deleted Successfully");
+    Swal.fire("Deleted!", "Category removed successfully", "success");
   } catch (err) {
-    toast.error(err.message);
+    Swal.fire("Error!", err.message, "error");
   }
   };
 
@@ -115,9 +115,9 @@ function CategoriesDS() {
       setCategories((prev) =>
         prev.map((cat) => (cat.id === id ? { ...cat, name: newName } : cat))
       );
-      toast.success("Category updated successfully!");
+      Swal.fire("Updated!", "Category updated successfully", "success");
     } catch (err) {
-      toast.error(err.message);
+      Swal.fire("Error!", err.message, "error");
     }
   };
 

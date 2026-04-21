@@ -3,6 +3,7 @@ import { useCart } from "../context/CartContext";
 import { FiTrash2, FiPlus, FiMinus, FiShoppingBag } from "react-icons/fi";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import ErrorMessage from "../components/ErrorMessage";
 import API_ENDPOINTS from "../config/apiConfig";
 
 function Cart() {
@@ -16,6 +17,7 @@ function Cart() {
     paymentMethod: "CashOnDelivery"
   });
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [error, setError] = useState("");
 
   const getPrice = (item) => {
     return item.price || item.productPrice || item.unitPrice || item.cost || 0;
@@ -25,8 +27,9 @@ function Cart() {
   const shipping = subtotal > 0 ? 50 : 0; 
 
   const handleCheckout = async () => {
+    setError("");
     if (!checkoutData.phoneNumber || !checkoutData.city || !checkoutData.address) {
-      toast.error("Please fill in all shipping details");
+      setError("Please fill in all shipping details");
       return;
     }
 
@@ -49,10 +52,12 @@ function Cart() {
         navigate("/"); // Redirect to home or orders page after success
       } else {
         const errText = await res.text();
-        toast.error(`Checkout failed: ${errText}`);
+        console.error("Checkout failed:", errText);
+        setError(`Checkout failed: ${errText}`);
       }
     } catch (error) {
-      toast.error("Network error during checkout");
+      console.error("Network error during checkout:", error);
+      setError("Network error during checkout");
     } finally {
       setIsCheckingOut(false);
     }
@@ -114,14 +119,14 @@ function Cart() {
                     }}
                     className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
                   >
-                    <FiMinus />
+                    <FiMinus className='cursor-pointer' />
                   </button>
                   <span className="font-bold">{item.quantity}</span>
                   <button 
                     onClick={() => addToCart(item.productId)}
                     className="w-8 h-8 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors"
                   >
-                    <FiPlus />
+                    <FiPlus className='cursor-pointer' />
                   </button>
                 </div>
               </div>
@@ -130,7 +135,7 @@ function Cart() {
                 onClick={() => removeItem(item.productId)}
                 className="p-2 text-gray-400 hover:text-red-500 transition-colors"
               >
-                <FiTrash2 size={20} />
+                <FiTrash2 className='cursor-pointer hover:scale-120 text-red-600 duration-200' size={25} />
               </button>
             </div>
           ))}
@@ -138,7 +143,7 @@ function Cart() {
           {/* Clear Cart Button */}
           <button 
             onClick={clearCart}
-            className="text-red-500 text-sm font-bold flex items-center gap-2 mt-2 w-fit hover:underline"
+            className="text-red-500 cursor-pointer text-sm font-bold flex items-center gap-2 mt-2 w-fit hover:underline"
           >
             <FiTrash2 /> Clear Shopping Cart
           </button>
@@ -148,6 +153,8 @@ function Cart() {
         <div className="lg:col-span-1">
           <div className="bg-(--border-color) p-6 rounded-3xl sticky top-28 shadow-xl border border-white/5">
             <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+
+            <ErrorMessage message={error} onClose={() => setError("")} />
 
             {/* Checkout Form */}
             <div className="flex flex-col gap-3 mb-6">
@@ -173,13 +180,13 @@ function Cart() {
                 onChange={e => setCheckoutData({...checkoutData, address: e.target.value})}
               />
               <select 
-                className="w-full bg-(--bg-color) text-(--text-color) border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-(--primary-color)"
+                className="w-full bg-(--bg-color) text-(--text-color) border border-white/10 rounded-xl px-4 py-3 outline-none cursor-pointer focus:border-(--primary-color)"
                 value={checkoutData.paymentMethod}
                 onChange={e => setCheckoutData({...checkoutData, paymentMethod: e.target.value})}
               >
-                <option value="CashOnDelivery">Cash on Delivery</option>
-                <option value="CreditCard">Credit Card</option>
-                <option value="Paypal">PayPal</option>
+                <option className='bg-(--border-color) cursor-pointer' value="CashOnDelivery">Cash on Delivery</option>
+                <option className='bg-(--border-color) cursor-pointer' value="CreditCard" disabled>Credit Card (Not Available)</option>
+                <option className='bg-(--border-color) cursor-pointer' value="Paypal" disabled>PayPal (Not Available)</option>
               </select>
             </div>
             
@@ -202,7 +209,7 @@ function Cart() {
             <button 
               onClick={handleCheckout}
               disabled={isCheckingOut}
-              className="w-full bg-(--primary-color) text-white py-4 rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-(--primary-color)/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full cursor-pointer bg-(--primary-color) text-white py-4 rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-(--primary-color)/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isCheckingOut ? "Processing..." : "Proceed to Checkout"}
             </button>

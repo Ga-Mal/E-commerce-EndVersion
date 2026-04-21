@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FiPlus, FiMinus, FiShoppingCart, FiArrowLeft } from "react-icons/fi";
-
 import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext";
 import API_ENDPOINTS from "../config/apiConfig";
@@ -9,14 +8,11 @@ import API_ENDPOINTS from "../config/apiConfig";
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { cart, addToCart, updateQuantity, removeItem } = useCart(); 
-
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-
-  // إيجاد المنتج في السلة لمعرفة الكمية الحالية
+  const { cart, addToCart, updateQuantity, removeItem } = useCart(); 
   const cartItem = cart?.items?.find((item) => item.productId === parseInt(id));
   const quantity = cartItem?.quantity || 0;
 
@@ -40,24 +36,20 @@ function ProductDetails() {
     return () => controller.abort();
   }, [id]);
 
-  // دالة التعامل مع إضافة منتج للسلة عبر الـ API والـ Context
   const handleQuantityChange = async (type) => {
     setIsAdding(true);
     try {
       if (type === "increment") {
         await addToCart(product.id, 1);
-        toast.success("Added to cart");
       } else {
         if (quantity > 1) {
           await updateQuantity(product.id, quantity - 1);
-          toast.success("Cart updated");
         } else {
           await removeItem(product.id);
-          toast.success("Removed from cart");
         }
       }
     } catch (err) {
-      toast.error(err.message);
+      console.error("Cart action failed:", err.message);
     } finally {
       setIsAdding(false);
     }
@@ -142,7 +134,7 @@ function ProductDetails() {
             <button
               onClick={() => handleQuantityChange("increment")}
               disabled={product.stock === 0 || isAdding}
-              className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:bg-(--border-color) disabled:text-(--text-color) uppercase tracking-widest shadow-[0_0_20px_rgba(234,179,8,0.3)]"
+              className="w-full cursor-pointer bg-yellow-500 hover:bg-yellow-400 text-black font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:bg-(--border-color) disabled:text-(--text-color) uppercase tracking-widest shadow-[0_0_20px_rgba(234,179,8,0.3)]"
             >
               <FiShoppingCart size={20} />
               {quantity > 0 ? "Add More to Cart" : "Add to Cart"}

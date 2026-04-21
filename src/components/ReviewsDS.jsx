@@ -20,7 +20,7 @@ export default function ReviewsDS() {
       setFeedbacks(data);
     } catch (error) {
       console.error("Error fetching feedbacks:", error);
-      toast.error("Failed to load feedbacks");
+      Swal.fire("Error!", "Failed to load feedbacks", "error");
     } finally {
       setLoading(false);
     }
@@ -38,7 +38,13 @@ export default function ReviewsDS() {
     });
 
     if (result.isConfirmed) {
-      const toastId = toast.loading("Deleting feedback...");
+      Swal.fire({
+        title: "Deleting...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
       try {
         const res = await fetch(`${API_ENDPOINTS.FEEDBACK}/${id}`, {
           method: "DELETE",
@@ -48,9 +54,9 @@ export default function ReviewsDS() {
         if (!res.ok) throw new Error("Failed to delete feedback");
 
         setFeedbacks((prev) => prev.filter((item) => item.id !== id));
-        toast.success("Feedback has been removed.", { id: toastId });
+        Swal.fire("Deleted!", "Feedback has been removed.", "success");
       } catch (error) {
-        toast.error(error.message, { id: toastId });
+        Swal.fire("Error!", error.message, "error");
       }
     }
   };

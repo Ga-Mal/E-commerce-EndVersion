@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+// AuthContext: Manages the authentication state of the application
+// Stores tokens, handles login/logout, and decodes user roles from JWT
 const AuthContext = createContext();
 
+// Custom hook to easily access auth state from any component
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -14,6 +17,7 @@ export const AuthProvider = ({ children }) => {
     setAuthLoading(true);
     if (token) {
       try {
+        // Step 1: Extract and decode the JWT payload (Base64)
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
@@ -22,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         
         const decoded = JSON.parse(jsonPayload);
 
-        // Check for expiration
+        // Step 2: Check for Token Expiration (Time-based security)
         const currentTime = Date.now() / 1000;
         if (decoded.exp && decoded.exp < currentTime) {
           console.warn('Token expired');
@@ -31,13 +35,15 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
+        // Step 3: Persist token and update logged-in state
         localStorage.setItem('token', token);
         setIsLoggedIn(true);
         
-        // Extract role. ASP.NET core usually puts it in schemas.microsoft.../role or 'role'
+        // Step 4: Extract User Role from specific JWT claims
+        // ASP.NET Core often uses the full schema URI for roles
         const roleClaim = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role || decoded.Role;
         
-        // Handle array of roles or single string
+        // Handle cases where a user might have multiple roles (Array) or a single one (String)
         if (Array.isArray(roleClaim)) {
           setUserRole(roleClaim.includes('Admin') ? 'Admin' : 'User');
         } else {
@@ -48,6 +54,7 @@ export const AuthProvider = ({ children }) => {
         logout();
       }
     } else {
+      // Clear all state if no token exists
       localStorage.removeItem('token');
       setIsLoggedIn(false);
       setUserRole(null);
@@ -55,10 +62,12 @@ export const AuthProvider = ({ children }) => {
     setAuthLoading(false);
   }, [token]);
 
+  // Updates the token state and triggers the useEffect to re-validate
   const login = (newToken) => {
     setToken(newToken);
   };
 
+  // Clears the token state and triggers the useEffect to cleanup
   const logout = () => {
     setToken(null);
   };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 import { FiPrinter } from "react-icons/fi";
 import API_ENDPOINTS from "../config/apiConfig";
 import { useAuth } from "../context/AuthContext";
@@ -29,7 +29,7 @@ function OrdersDS() {
       });
 
       if (res.status === 401) {
-        toast.error("Session expired. Please login again.");
+        Swal.fire("Session Expired", "Please login again to continue.", "warning");
         logout();
         return;
       }
@@ -59,7 +59,13 @@ function OrdersDS() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     const token = localStorage.getItem("token");
-    const toastId = toast.loading("Updating status...");
+    const loadingSwal = Swal.fire({
+      title: "Updating status...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
     
     try {
       const res = await fetch(API_ENDPOINTS.ORDER_STATUS(orderId, newStatus), {
@@ -82,10 +88,10 @@ function OrdersDS() {
             : order
         )
       );
-      toast.success(`Status updated to ${newStatus}`, { id: toastId });
+      Swal.fire("Success", `Status updated to ${newStatus}`, "success");
     } catch (err) {
       console.error(err);
-      toast.error(`Update failed: ${err.message}`, { id: toastId });
+      Swal.fire("Error", `Update failed: ${err.message}`, "error");
     }
   };
 
@@ -334,9 +340,9 @@ function OrdersDS() {
             </div>
             
             {/* Debug (remove later if mapping is perfect) */}
-            {typeof order.total === 'undefined' && typeof order.totalAmount === 'undefined' && (
+            {/* {typeof order.total === 'undefined' && typeof order.totalAmount === 'undefined' && (
               <p className="text-[9px] text-gray-500 mt-2 break-all">Debug: {Object.keys(order).join(", ")}</p>
-            )}
+            )} */}
           </div>
         );
         })}

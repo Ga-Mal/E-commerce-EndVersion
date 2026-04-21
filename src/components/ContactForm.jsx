@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FiInstagram, FiMail, FiStar } from "react-icons/fi";
 import toast from "react-hot-toast";
+import ErrorMessage from "./ErrorMessage";
 import API_ENDPOINTS from "../config/apiConfig";
 
 export default function ContactForm() {
@@ -9,6 +10,7 @@ export default function ContactForm() {
     message: "",
     rate: 5,
   });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,6 +19,7 @@ export default function ContactForm() {
 
   const submitForm = async (e) => {
     e.preventDefault();
+    setError("");
     const token = localStorage.getItem("token");
     
     const loadingToast = toast.loading("Sending feedback...");
@@ -44,7 +47,9 @@ export default function ContactForm() {
         throw new Error("Failed to send feedback");
       }
     } catch (err) {
-      toast.error(err.message, { id: loadingToast });
+      console.error("Feedback Error:", err);
+      setError(err.message || "Failed to send feedback");
+      toast.dismiss(loadingToast);
     }
   };
 
@@ -70,6 +75,7 @@ export default function ContactForm() {
         </div>
 
         <div className="md:w-2/3">
+          <ErrorMessage message={error} onClose={() => setError("")} />
           <form className="grid grid-cols-1 gap-8" onSubmit={submitForm}>
             <div className="grid grid-cols-1 gap-8">
               <div className="space-y-2">
