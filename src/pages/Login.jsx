@@ -4,6 +4,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import API_ENDPOINTS from "../config/apiConfig";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +44,7 @@ export default function Login() {
     const loadingToast = toast.loading("Signing in...");
 
     try {
-      const response = await axios.post("https://gemystore.runasp.net/api/Account/Login", {
+      const response = await axios.post(API_ENDPOINTS.LOGIN, {
         email: email,
         password: password,
       });

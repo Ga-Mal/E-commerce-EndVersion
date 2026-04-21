@@ -14,7 +14,7 @@ export default function Footer() {
         {/* Column 1: Brand Info */}
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-white tracking-wider">
-            E-Commerce
+            GMS
           </h2>
           <p className="text-sm text-gray-400 leading-relaxed">
             Leading the way in contemporary women's fashion. Defining style with

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast/headless";
+import API_ENDPOINTS from "../config/apiConfig";
 
 function CategoriesDS() {
   const [categories, setCategories] = useState([]);
@@ -15,7 +16,7 @@ function CategoriesDS() {
     const fetchCategories = async () => {
       try {
         const res = await fetch(
-          "https://egyptdiscover.runasp.net/api/Category/Get All Category",
+          API_ENDPOINTS.CATEGORIES,
           { signal: controller.signal },
         );
 
@@ -43,7 +44,7 @@ function CategoriesDS() {
     const token = localStorage.getItem("token");
     
     try {
-      const res = await fetch("https://egyptdiscover.runasp.net/api/Category/AddCategory",
+      const res = await fetch(API_ENDPOINTS.ADD_CATEGORY,
         {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -76,7 +77,7 @@ function CategoriesDS() {
   if (!window.confirm("Are you sure you want to delete this category?")) return;
   const token = localStorage.getItem("token");
   try {
-    const res = await fetch(`https://egyptdiscover.runasp.net/api/Category/${id}`, {
+    const res = await fetch(API_ENDPOINTS.CATEGORY_BY_ID(id), {
       method: "DELETE",
       headers: { 
         Authorization: `Bearer ${token}` 
@@ -99,7 +100,7 @@ function CategoriesDS() {
 
     const token = localStorage.getItem("token");  
     try {
-      const res = await fetch(`https://egyptdiscover.runasp.net/api/Category/${id}`, {
+      const res = await fetch(API_ENDPOINTS.CATEGORY_BY_ID(id), {
         method: "PUT",
         headers: { 
           "Content-Type": "application/json",

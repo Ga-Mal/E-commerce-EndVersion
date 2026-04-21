@@ -5,24 +5,33 @@ import { Link } from "react-router";
 const slides = [
   {
     id: 1,
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop",
-    title: "Elegance Meets Style",
-    subtitle: "Discover the latest trends in women’s fashion.",
+    image: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=2070&auto=format&fit=crop",
+    title: "Timeless Elegance",
+    subtitle: "Experience luxury fashion that defines your personality.",
   },
   {
     id: 2,
-    image:
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2020&auto=format&fit=crop",
-    title: "Your Daily Dose of Glamour",
-    subtitle: "Upgrade your wardrobe with our exclusive collection.",
+    image: "https://images.unsplash.com/photo-1491933382434-500287f9b54b?q=80&w=1964&auto=format&fit=crop",
+    title: "Tech Innovation",
+    subtitle: "Stay ahead of the curve with our cutting-edge gadget collection.",
   },
   {
     id: 3,
-    image:
-      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop",
-    title: "Be Bold. Be Beautiful.",
-    subtitle: "Fashion that speaks to your unique personality.",
+    image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=2070&auto=format&fit=crop",
+    title: "Urban Lifestyle",
+    subtitle: "Modern essentials for the contemporary urban dweller.",
+  },
+  {
+    id: 4,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999&auto=format&fit=crop",
+    title: "Premium Accessories",
+    subtitle: "The perfect details to complete your sophisticated look.",
+  },
+  {
+    id: 5,
+    image: "https://images.unsplash.com/photo-1485125639709-a60c3a500bf1?q=80&w=2070&auto=format&fit=crop",
+    title: "Summer Essentials",
+    subtitle: "Fresh trends to keep you cool and stylish all season long.",
   },
 ];
 

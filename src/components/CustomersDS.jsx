@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { styleBtnStatus } from "./OrdersDS";
 import Swal from "sweetalert2";
+import API_ENDPOINTS from "../config/apiConfig";
 
 function CustomersDS() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "https://gemystore.runasp.net/api/Account/AllUsers";
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -16,7 +16,7 @@ function CustomersDS() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(API_ENDPOINTS.USERS, {
         headers: {
           Authorization: `Bearer ${token}`,
         }, 
@@ -48,7 +48,7 @@ function CustomersDS() {
     if (result.isConfirmed) {
       try {
         // Updated delete endpoint based on common naming conventions
-        const res = await fetch(`https://gemystore.runasp.net/api/Account/DeleteUser?id=${userId}`, {
+        const res = await fetch(API_ENDPOINTS.DELETE_USER(userId), {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FiStar } from "react-icons/fi";
+import API_ENDPOINTS from "../config/apiConfig";
 
 export default function Reviews() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -7,17 +8,18 @@ export default function Reviews() {
 
   const fetchFeedbacks = async () => {
     try {
-      const res = await fetch("https://gemystore.runasp.net/api/Feedback", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const token = localStorage.getItem("token");
+      const res = await fetch(API_ENDPOINTS.FEEDBACK, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
       if (!res.ok) {
+        if (res.status === 401) return; // Silent fail for visitors
         throw new Error("Failed to fetch feedbacks");
       }
       const data = await res.json();
-      setFeedbacks(data);
+      // Filter to show only feedbacks that the admin has marked as visible
+      const visibleFeedbacks = Array.isArray(data) ? data.filter(item => item.isVisible !== false) : [];
+      setFeedbacks(visibleFeedbacks);
     } catch (error) {
       console.error("Error fetching feedbacks:", error);
     } finally {
@@ -29,10 +31,9 @@ export default function Reviews() {
     fetchFeedbacks();
   }, []);
 
-  if (loading) return null; // Don't show anything while loading on the home page
-  if (feedbacks.length === 0) return null; // Don't show section if no feedbacks
+  if (loading) return null;
+  if (feedbacks.length === 0) return null;
 
-  // Optionally limit to top 3 or latest 3 feedbacks for the home page
   const displayFeedbacks = feedbacks.slice(0, 3);
 
   return (
@@ -54,7 +55,7 @@ export default function Reviews() {
               "{item.comment}"
             </p>
             <h5 className="font-black tracking-widest uppercase mt-auto">
-               {item.userName || "Customer"}
+               {item.name || item.userName || "Customer"}
             </h5>
           </div>
         ))}

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import API_ENDPOINTS from "../config/apiConfig";
 
 const CartContext = createContext();
 
@@ -11,7 +12,7 @@ export function CartProvider({ children }) {
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
-      const res = await fetch("https://gemystore.runasp.net/api/Cart/MyCart", {
+      const res = await fetch(API_ENDPOINTS.MY_CART, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -32,7 +33,7 @@ export function CartProvider({ children }) {
     }
     
     try {
-      const res = await fetch(`https://gemystore.runasp.net/api/Cart/add-item-to-cart?productId=${productId}&quantity=${quantity}`, {
+      const res = await fetch(API_ENDPOINTS.ADD_TO_CART(productId, quantity), {
         method: "POST",
         headers: { 
           "Content-Type": "application/json", 
@@ -56,7 +57,7 @@ export function CartProvider({ children }) {
   // 3. PUT /api/Cart/update-item-in-cart
   const updateQuantity = async (productId, newQuantity) => {
     const token = localStorage.getItem("token");
-    const res = await fetch(`https://gemystore.runasp.net/api/Cart/update-item-in-cart?productId=${productId}&newQuantity=${newQuantity}`, {
+    const res = await fetch(API_ENDPOINTS.UPDATE_CART(productId, newQuantity), {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
     });
@@ -72,7 +73,7 @@ export function CartProvider({ children }) {
   const removeItem = async (productId) => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`https://gemystore.runasp.net/api/Cart/remove-item-from-cart?productId=${productId}`, {
+      const res = await fetch(API_ENDPOINTS.REMOVE_FROM_CART(productId), {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -89,7 +90,7 @@ export function CartProvider({ children }) {
   // 5. DELETE /api/Cart/clear
   const clearCart = async () => {
     const token = localStorage.getItem("token");
-    const res = await fetch("https://gemystore.runasp.net/api/Cart/clear", {
+    const res = await fetch(API_ENDPOINTS.CLEAR_CART, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

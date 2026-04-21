@@ -3,6 +3,7 @@ import { useCart } from "../context/CartContext";
 import { FiTrash2, FiPlus, FiMinus, FiShoppingBag } from "react-icons/fi";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import API_ENDPOINTS from "../config/apiConfig";
 
 function Cart() {
   const { cart, addToCart, updateQuantity, removeItem, clearCart } = useCart();
@@ -33,7 +34,7 @@ function Cart() {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("https://gemystore.runasp.net/api/Orders/Checkout->Create-Order", {
+      const res = await fetch(API_ENDPOINTS.CHECKOUT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,7 +91,7 @@ function Cart() {
             >
               {/* Product Image */}
               <img 
-                src={`https://gemystore.runasp.net${item.imageUrl}`} 
+                src={`${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${item.imageUrl}`} 
                 alt={item.productName} 
                 className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl"
               />

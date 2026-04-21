@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import logo from "../assets/logoIcon.png";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
@@ -40,8 +41,8 @@ function Navbar() {
       <div className="flex justify-around backdrop-blur-2xl items-center shadow-2xl py-2 px-6 mx-auto my-3 w-[90%] rounded-lg bg-(--border-color)/40">
 
         {/* Logo */}
-        <NavLink to="/" className="font-bold text-lg">
-          Logo
+        <NavLink to="/">
+          <img className="w-[50px]" src={logo} alt="logo" />
         </NavLink>
 
         {/* Desktop Links */}

@@ -2,17 +2,16 @@ import { useEffect, useState } from "react";
 import { FiStar, FiTrash2 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
+import API_ENDPOINTS from "../config/apiConfig";
 
 export default function ReviewsDS() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = "https://gemystore.runasp.net/api/Feedback";
-
   const fetchFeedbacks = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(API_ENDPOINTS.FEEDBACK, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -41,7 +40,7 @@ export default function ReviewsDS() {
     if (result.isConfirmed) {
       const toastId = toast.loading("Deleting feedback...");
       try {
-        const res = await fetch(`${API_URL}/${id}`, {
+        const res = await fetch(`${API_ENDPOINTS.FEEDBACK}/${id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -99,7 +98,7 @@ export default function ReviewsDS() {
               {/* User Name & Email */}
               <div className="mt-auto pt-3 border-t border-(--primary-color) w-full text-center">
                 <h5 className="text-xs font-bold tracking-wider uppercase text-gray-200">
-                  {item.userName || "Customer"}
+                  {item.name || item.userName || "Customer"}
                 </h5>
                 {item.email && <p className="text-[10px] text-gray-500">{item.email}</p>}
               </div>

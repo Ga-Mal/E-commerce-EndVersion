@@ -8,12 +8,11 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
+    setAuthLoading(true);
     if (token) {
-      localStorage.setItem('token', token);
-      setIsLoggedIn(true);
-      
       try {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -22,6 +21,19 @@ export const AuthProvider = ({ children }) => {
         }).join(''));
         
         const decoded = JSON.parse(jsonPayload);
+
+        // Check for expiration
+        const currentTime = Date.now() / 1000;
+        if (decoded.exp && decoded.exp < currentTime) {
+          console.warn('Token expired');
+          logout();
+          setAuthLoading(false);
+          return;
+        }
+
+        localStorage.setItem('token', token);
+        setIsLoggedIn(true);
+        
         // Extract role. ASP.NET core usually puts it in schemas.microsoft.../role or 'role'
         const roleClaim = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role || decoded.Role;
         
@@ -32,7 +44,7 @@ export const AuthProvider = ({ children }) => {
           setUserRole(roleClaim || 'User');
         }
       } catch (err) {
-        console.error('Invalid token format');
+        console.error('Invalid token format or processing error');
         logout();
       }
     } else {
@@ -40,6 +52,7 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn(false);
       setUserRole(null);
     }
+    setAuthLoading(false);
   }, [token]);
 
   const login = (newToken) => {
@@ -51,7 +64,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, isLoggedIn, userRole, login, logout }}>
+    <AuthContext.Provider value={{ token, isLoggedIn, userRole, login, logout, authLoading }}>
       {children}
     </AuthContext.Provider>
   );

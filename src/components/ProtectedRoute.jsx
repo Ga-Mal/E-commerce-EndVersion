@@ -4,7 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 function ProtectedRoute({ requiredRole }) {
-  const { isLoggedIn, userRole } = useAuth();
+  const { isLoggedIn, userRole, authLoading } = useAuth();
+
+  if (authLoading) {
+    return <div className="h-screen flex items-center justify-center">Verifying credentials...</div>;
+  }
 
   if (!isLoggedIn) {
     toast.error('Please login to access this page');

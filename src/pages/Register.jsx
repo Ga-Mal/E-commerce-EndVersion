@@ -4,6 +4,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { FaFacebookF, FaGoogle } from "react-icons/fa";
 import { inputsStyle } from "./Login";
 import toast from "react-hot-toast";
+import API_ENDPOINTS from "../config/apiConfig";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -47,7 +48,7 @@ export default function Register() {
     const toastId = toast.loading("Creating account...");
 
     try {
-      const response = await fetch("https://gemystore.runasp.net/api/Account/Register", {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { NavLink } from "react-router-dom"; // تأكد من المسار الصحيح
+import API_ENDPOINTS from "../config/apiConfig";
 
 function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -16,7 +17,7 @@ function ProductsPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch("https://gemystore.runasp.net/api/Product/Products",
+        const res = await fetch(API_ENDPOINTS.PRODUCTS,
           { signal: controller.signal },
         );
 
@@ -70,7 +71,7 @@ function ProductsPage() {
               key={product.id}
               className="bg-(--border-color) rounded-2xl shadow-md overflow-hidden flex flex-col">
               {/* Image */}
-              <img src={`https://gemystore.runasp.net${product.imageUrl}`} alt={product.name}
+              <img src={`${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${product.imageUrl}`} alt={product.name}
                 className="h-40 w-full object-cover"
               />
 
@@ -92,9 +93,9 @@ function ProductsPage() {
                 </span>
 
                 {/* Button Section */}
-                <div className="mt-auto flex items-center justify-between gap-2">
+                <div className="mt-auto  md:flex items-center justify-between gap-2">
                   {/* Counter */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2 my-2">
                     <button
                       onClick={() => addToCart(product.id)}
                       className="bg-(--primary-color) cursor-pointer hover:scale-105 duration-150 text-white px-3 py-1 rounded-lg"
@@ -120,8 +121,8 @@ function ProductsPage() {
                   </div>
 
                   {/* Show Button */}
-                  <NavLink to={`/${product.id}`}
-                    className="bg-(--primary-color) cursor-pointer hover:scale-105 duration-150 text-white px-3 py-1 rounded-xl text-xs">
+                  <NavLink to={`/products/${product.id}`}
+                    className="bg-(--primary-color) cursor-pointer block text-center hover:scale-105 duration-150 text-white px-3 py-1 rounded-xl text-lg">
                     Show
                   </NavLink>
                 </div>

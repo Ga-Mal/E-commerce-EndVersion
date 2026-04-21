@@ -17,16 +17,19 @@ import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import ContactPage from "./pages/ContactPage";
 
-// New Auth Imports
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
+import BackToTop from "./components/BackToTop";
 
 function MainLayout() {
   return (
     <>
+      <ScrollToTop />
       <Toaster position="top-left" reverseOrder={false} />
       <Navbar />
       <Outlet />
+      <BackToTop />
       <Footer />
     </>
   );

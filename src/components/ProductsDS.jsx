@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import API_ENDPOINTS from "../config/apiConfig";
 
 function ProductsDS() {
   const [products, setProducts] = useState([]);
@@ -18,8 +19,6 @@ function ProductsDS() {
     stock: 0,
   });
 
-  const BASE_URL = "https://gemystore.runasp.net/api/Product";
-  const CAT_URL = "https://gemystore.runasp.net/api/Category/Get All Category";
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -29,14 +28,14 @@ function ProductsDS() {
   const loadData = async () => {
     try {
       const [prodRes, catRes] = await Promise.all([
-        fetch(`${BASE_URL}/Products`),
-        fetch(CAT_URL)
+        fetch(API_ENDPOINTS.PRODUCTS),
+        fetch(API_ENDPOINTS.CATEGORIES)
       ]);
       if (!prodRes.ok || !catRes.ok) throw new Error("Fetch failed");
       setProducts(await prodRes.json());
       setCategories(await catRes.json());
     } catch (err) {
-      setError(err.message);
+      setError(err.message); 
     } finally {
       setLoading(false);
     }
@@ -91,7 +90,7 @@ function ProductsDS() {
       if (selectedFile) {
         data.append("image", selectedFile); 
       }
-      const url = editingProduct ? `${BASE_URL}/${editingProduct.id}` : `${BASE_URL}/AddProduct`;
+      const url = editingProduct ? API_ENDPOINTS.PRODUCT_BY_ID(editingProduct.id) : API_ENDPOINTS.ADD_PRODUCT;
         
       const method = editingProduct ? "PUT" : "POST"; 
 
@@ -151,7 +150,7 @@ function ProductsDS() {
     // 2. If user confirmed, proceed with deletion
     if (result.isConfirmed) {
       try {
-        const res = await fetch(`${BASE_URL}/${id}`, {
+        const res = await fetch(API_ENDPOINTS.PRODUCT_BY_ID(id), {
           method: "DELETE",
           headers: { 
             Authorization: `Bearer ${token}` 
@@ -197,7 +196,7 @@ function ProductsDS() {
         {products.map((product) => (
           <div key={product.id} className="bg-(--secondary-color) rounded-2xl overflow-hidden border border-(--border-color) flex flex-col shadow-lg">
             <img 
-              src={`https://gemystore.runasp.net${product.imageUrl}`} 
+              src={`${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${product.imageUrl}`} 
               alt={product.name} 
               className="h-48 w-full object-cover bg-transparent" 
             />
@@ -221,7 +220,7 @@ function ProductsDS() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 text-(--text-color) flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-(--secondary-color) rounded-2xl w-full max-w-lg border border-(--border-color) shadow-2xl">
+          <div className="bg-(--border-color)/70 rounded-2xl w-full max-w-lg border border-(--border-color) shadow-2xl">
             <div className="p-2 px-4 border-b border-(--border-color) flex justify-between items-center">
               <h2 className="text-xl font-bold">{editingProduct ? "Edit" : "Add"} Product</h2>
               <button onClick={closeModal} className="text-2xl cursor-pointer hover:scale-120 duration-200 text-red-500">×</button>
@@ -250,9 +249,9 @@ function ProductsDS() {
               <div>
                 <label className="block text-sm text-(--text-color) opacity-80 mb-1">Category</label>
                 <select name="categoryId" value={formData.categoryId} onChange={handleInputChange} required 
-                  className="w-full p-2.5 bg-transparent border border-(--border-color) rounded-lg outline-none focus:border-purple-500 cursor-pointer">
-                  <option value="">Select Category</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  className="w-full p-2.5 border border-(--border-color) rounded-lg outline-none focus:border-purple-500 cursor-pointer">
+                  <option value="" className="bg-(--border-color)">Select Category</option>
+                  {categories.map(c => <option className="bg-(--border-color)" key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
 

@@ -4,6 +4,7 @@ import { FiPlus, FiMinus, FiShoppingCart, FiArrowLeft } from "react-icons/fi";
 
 import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext";
+import API_ENDPOINTS from "../config/apiConfig";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -23,7 +24,7 @@ function ProductDetails() {
     const controller = new AbortController();
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`https://gemystore.runasp.net/api/Product/${id}`, {
+        const res = await fetch(API_ENDPOINTS.PRODUCT_BY_ID(id), {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error("Product not found");
@@ -64,6 +65,7 @@ function ProductDetails() {
 
   if (loading) return <div className="flex justify-center items-center h-screen text-(--text-color)">Loading Product...</div>;
   if (error) return <div className="text-center mt-20 text-red-500">{error}</div>;
+  if (!product) return null;
 
   return (
     <div className="pt-24 pb-12 px-4 max-w-6xl mx-auto">
@@ -80,7 +82,7 @@ function ProductDetails() {
         {/* Image Section */}
         <div className="overflow-hidden rounded-2xl bg-transparent h-[400px] md:h-[500px]">
           <img
-            src={`https://gemystore.runasp.net${product.imageUrl}`}
+            src={`${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${product.imageUrl}`}
             alt={product.name}
             className="w-full h-full object-cover hover:scale-105 duration-500"
           />

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FiInstagram, FiMail, FiStar } from "react-icons/fi";
 import toast from "react-hot-toast";
+import API_ENDPOINTS from "../config/apiConfig";
 
 export default function ContactForm() {
   const [form, setForm] = useState({
@@ -21,13 +22,14 @@ export default function ContactForm() {
     const loadingToast = toast.loading("Sending feedback...");
 
     try {
-      const response = await fetch("https://gemystore.runasp.net/api/Feedback", {
+      const response = await fetch(API_ENDPOINTS.FEEDBACK, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` })
         },
         body: JSON.stringify({
+          name: form.name,
           userName: form.name,
           comment: form.message,
           rate: Number(form.rate),
