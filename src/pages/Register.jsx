@@ -196,7 +196,7 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full hover:scale-105 py-2! disabled:opacity-50 disabled:cursor-not-allowed">
+            className="w-full bg-(--primary-color) cursor-pointer text-white py-2 rounded-lg font-bold hover:scale-105 transition-all disabled:opacity-50">
             {loading ? "Creating account..." : "Sign Up"}
           </button>
         </form>
@@ -209,12 +209,12 @@ export default function Register() {
         </div>
 
         {/* Social */}
-        <button className="w-full p-2! flex items-center justify-center gap-7 mb-4!">
+        <button className="w-full flex items-center justify-center gap-7 mb-2 bg-(--primary-color) cursor-pointer text-white py-2 rounded-lg font-bold hover:scale-105 transition-all disabled:opacity-50">
           Continue With Google
           <FaGoogle />
         </button>
 
-        <button className="w-full p-2! flex items-center justify-center gap-2">
+        <button className="w-full flex items-center justify-center gap-2 bg-(--primary-color) cursor-pointer text-white py-2 rounded-lg font-bold hover:scale-105 transition-all disabled:opacity-50">
           Continue With Facebook
           <FaFacebookF />
         </button>
