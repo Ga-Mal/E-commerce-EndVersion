@@ -18,7 +18,6 @@ import Cart from "./pages/Cart";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 import ErrorPage from "./pages/ErrorPage";
-
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
@@ -60,14 +59,9 @@ const router = createBrowserRouter([
       { path: "cart", element: <Cart /> },
       
       // Protected Dashboard Routes: Only accessible by users with "Admin" role
-      { 
-        path: "dashboard", 
-        element: <ProtectedRoute requiredRole="Admin" />, 
+      { path: "dashboard", element: <ProtectedRoute requiredRole="Admin" />, 
         children: [
-          {
-            path: "",
-            element: <Dashboard />, 
-            handle: { title: "Dashboard" }, 
+          { path: "", element: <Dashboard />, handle: { title: "Dashboard" }, 
             children: [
               { path: "orders", element: <OrdersDS />, handle: { title: "Orders" } },
               { path: "customers", element: <CustomersDS />, handle: { title: "Customers" } },

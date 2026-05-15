@@ -43,7 +43,7 @@ function Navbar() {
         {/* Logo */}
         <NavLink to="/">
           <img className="w-[50px]" src={logo} alt="logo" />
-        </NavLink>
+        </NavLink> 
 
         {/* Desktop Links */}
         <div className="hidden md:flex gap-6">

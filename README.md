@@ -78,7 +78,7 @@ src/
 3. **Environment Configuration**:
    Create a `.env` file in the root directory:
    ```env
-   VITE_API_BASE_URL=https://gemystore.runasp.net/api
+   VITE_API_BASE_URL=BASE_API
    ```
 
 4. **Run Development Server**:
