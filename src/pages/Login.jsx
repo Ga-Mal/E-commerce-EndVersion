@@ -77,6 +77,7 @@ export default function Login() {
 
       if (token) {
         // Step 4: Save token and redirect
+        
         login(token); // Triggers AuthContext update
         toast.success("Welcome back!", { id: loadingToast });
         navigate("/"); 
